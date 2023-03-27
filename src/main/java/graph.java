@@ -1,0 +1,341 @@
+import com.mxgraph.layout.mxCircleLayout;
+import com.mxgraph.layout.mxIGraphLayout;
+import com.mxgraph.util.mxCellRenderer;
+
+import org.jgrapht.Graph;
+import org.jgrapht.ext.JGraphXAdapter;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+import org.jgrapht.nio.dot.DOTExporter;
+import org.jgrapht.nio.dot.DOTImporter;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.Scanner;
+import java.util.Set;
+
+
+public class graph {
+
+    public static void main(String[] args) throws IOException {
+        System.out.println("Enter dot format file name: ");
+        Scanner scanner = new Scanner(System.in);
+        String filepath = scanner.nextLine();
+
+        Graph<String, DefaultEdge> graph = parseGraph(filepath);
+
+        // Output the number of nodes
+        int numNodes = getNumNodes(graph);
+        System.out.println("number of nodes: " + numNodes);
+
+        // output the label of the nodes
+        String[] nodeNames = getNodeLabel(graph, numNodes);
+        printNodes(nodeNames, numNodes);
+
+        // output the number of edges
+        int numEdges = getNumEdges(graph);
+        System.out.println("number of edges: " + numEdges);
+
+        // output the nodes and the edge direction of edges
+        String nodesString = graphToString(graph, numEdges);
+        System.out.println("Nodes with edge direction: " + nodesString);
+
+        int optNum;
+        do {
+            System.out.println("----------------------------------");
+            System.out.println("Type option number: ");
+            System.out.println("\t1) Output graph to File\n" +
+                    "\t2)Add or remove single node\n" +
+                    "\t3)Add or remove list of nodes\n" +
+                    "\t4)Add or remove an edge\n" +
+                    "\t5)Output graph to DOT file\n" +
+                    "\t6)Output graph to to graphics");
+            optNum = Integer.parseInt(scanner.nextLine());
+
+            switch (optNum) {
+                case 1 -> {
+                    System.out.println("Enter file name: ");
+                    String filename = scanner.nextLine();
+                    outputGraph(graph, filename);
+                }
+                case 2 -> { // Add or remove single node
+                    System.out.println("1) Add single node\n" + "2) Remove single node");
+                    int addRemNode = Integer.parseInt(scanner.nextLine());
+                    if (addRemNode == 1) { // add node
+                        System.out.println("Type node label");
+                        String nodeLabel = (scanner.nextLine());
+                        addNode(graph, nodeLabel);
+                        numNodes = getNumNodes(graph);
+                        nodeNames = getNodeLabel(graph, numNodes);
+                        printNodes(nodeNames, numNodes);
+                    } else if (addRemNode == 2) { // remove node
+                        System.out.println("Type node label");
+                        String nodeLabel = (scanner.nextLine());
+                        removeNode(graph, nodeLabel);
+                        System.out.println(graph.vertexSet());
+                    }
+                }
+                case 3 -> { // Add or remove list of nodes
+                    System.out.println("1) Add list of nodes\n" + "2) Remove list of nodes");
+                    int addRemNodes = Integer.parseInt(scanner.nextLine());
+                    System.out.println("Type node labels separated by comma");
+                    String nodeLabels = (scanner.nextLine());
+                    nodeLabels = nodeLabels.replace(" ", "");
+                    String[] nodes = nodeLabels.split(",");
+                    if (addRemNodes == 1) { // add node
+                        addNodes(graph, nodes);
+                    } else if (addRemNodes == 2) { // remove node
+                        removeNodes(graph, nodes);
+                    }
+                    System.out.println(graph.vertexSet());
+                }
+                case 4 -> { // Add or remove an edge
+                    System.out.println("1) Add edge\n" + "2) Remove edge");
+                    int addRemEdge = Integer.parseInt(scanner.nextLine());
+                    System.out.println("Source node: ");
+                    String srcNode = (scanner.nextLine());
+                    System.out.println("Destination node: ");
+                    String destNode = (scanner.nextLine());
+                    if (addRemEdge == 1) { // add edge
+                        addEdge(graph, srcNode, destNode);
+                    } else if (addRemEdge == 2) { // remove edge
+                        int prev = graph.edgeSet().size();
+                        removeEdge(graph, srcNode, destNode);
+                        if (prev == graph.edgeSet().size())
+                            System.out.println("Edge does not exist.");
+                        else
+                            System.out.println("Edge " + srcNode + "," + destNode + " was removed.");
+                    }
+                    System.out.println(graph.edgeSet());
+                }
+                case 5 -> { // Output graph to DOT file
+                    System.out.println("Enter name of output file");
+                    String outFile = scanner.nextLine();
+                    outFile = outFile.replace(" ", "");
+                    outputDOTGraph(graph, outFile);
+                }
+                case 6 -> { //Output graph to graphics
+                    System.out.println("Enter name of output file:\nUse .png or.jpg");
+                    String outGraph = scanner.nextLine();
+                    outGraph = outGraph.replace(" ", "");
+                    String[] gName = outGraph.split("\\.");
+                    outputGraphics(graph, outGraph, gName[1].toUpperCase());
+                }
+                default -> {
+                }
+                //
+            }
+        } while (optNum >= 1 && optNum <= 6);
+
+    }
+
+    // --------------------------------------------------------------------------------
+    // Feature 1: Parse a DOT graph file to create a graph
+    // --------------------------------------------------------------------------------
+    // Accept a DOT graph file and create a directed graph object
+    public static Graph<String, DefaultEdge> parseGraph(String filepath) throws IOException {
+        int i;
+        String input = "";
+        try {
+            FileReader reader = new FileReader(filepath);       // opens file for reading
+            // reads entire file contents
+            while ((i = reader.read()) != -1) {
+                input = input + (char) i;
+            }
+            reader.close();
+        } catch (IOException e) {
+            System.out.println("File read error");
+        }
+        // Print all the content of a file
+        //System.out.print("input: " + input);
+
+        // get graph
+        // ** need get type of graph **
+        Graph<String, DefaultEdge> result = new SimpleDirectedGraph<>(DefaultEdge.class);
+        DOTImporter<String, DefaultEdge> dotImporter = new DOTImporter<>();
+
+        dotImporter.setVertexFactory(label -> label);
+        dotImporter.importGraph(result, new StringReader(input));
+
+        return result;
+    }
+
+    // ---------------------------------------------------------------------------------
+    static String graphToString(Graph<String, DefaultEdge> g, int numEdges) {
+        String temp = "";
+        String edgeString = "";
+        int i = 0;
+        for (DefaultEdge e : g.edgeSet()) {
+            temp = g.getEdgeSource(e) + " -> " + g.getEdgeTarget(e);
+            if (i < numEdges - 1) {
+                edgeString = edgeString.concat(temp).concat(", ");
+            } else {
+                edgeString = edgeString.concat(temp);
+            }
+            i++;
+
+        }
+        return edgeString;
+    }
+
+    // --------------------------------------------------------------------------------
+    public static void outputGraph(Graph<String, DefaultEdge> graph, String filepath) {
+        try {
+            File gFile = new File(filepath);
+            if (gFile.createNewFile()) {
+                System.out.println("File created: " + gFile.getName());
+            } else {
+                System.out.println("File already exists.");
+            }
+        } catch (IOException e) {
+            System.out.println("File Error.");
+        }
+        String graphString = graphToString(graph, graph.edgeSet().size());
+        try {
+            FileWriter writer = new FileWriter(filepath);
+            writer.write(graphString);
+            writer.close();
+            System.out.println(graphString);
+        } catch (IOException e) {
+            System.out.println("Write error.");
+        }
+    }
+
+    // --------------------------------------------------------------------------------
+    // *** Feature 2: Adding and removing nodes from the imported graph ***
+    // --------------------------------------------------------------------------------
+    public static void addNode(Graph<String, DefaultEdge> g, String label) {
+        if (g.addVertex(label)) {
+            g.addVertex(label);
+        }
+    }
+
+    // --------------------------------------------------------------------------------
+    public static void removeNode(Graph<String, DefaultEdge> g, String label) {
+        if (g.removeVertex(label)) {
+            g.removeVertex(label);
+        }
+    }
+
+    // --------------------------------------------------------------------------------
+    public static void addNodes(Graph<String, DefaultEdge> g, String[] nodesList) {
+        int i;
+        int lenList = nodesList.length;
+        for (i = 0; i < lenList; i++) {
+            if (g.addVertex(nodesList[i])) {
+                g.addVertex(nodesList[i]);
+            }
+        }
+    }
+
+    // --------------------------------------------------------------------------------
+    public static void removeNodes(Graph<String, DefaultEdge> g, String[] remNodes) {
+        int i;
+        int lenList = remNodes.length;
+        for (i = 0; i < lenList; i++) {
+            if (g.removeVertex(remNodes[i])) {
+                g.removeVertex(remNodes[i]);
+            }
+        }
+    }
+
+    // --------------------------------------------------------------------------------
+    //*** Feature 3: Adding and removing edges from the imported graph ***
+    // --------------------------------------------------------------------------------
+    // Add an edge and check of duplicate edges: addEdge(String srcLabel,String dstLabel)
+    public static void addEdge(Graph<String, DefaultEdge> g, String srcLabel, String dstLabel) {
+        try {
+            g.addEdge(srcLabel, dstLabel);
+            //DefaultEdge edgeVar = g.addEdge(srcLabel, dstLabel);
+            //if(edgeVar == null) {
+            //    System.out.println("Edge already exists.");
+            // }
+        } catch (Exception e) {
+            System.out.println("Add Edge Error: One or both of the given nodes do not exist.");
+        }
+    }
+
+    // --------------------------------------------------------------------------------
+    // Remove an edge: removeEdge(String srcLabel, String dstLabel)
+    public static void removeEdge(Graph<String, DefaultEdge> g, String srcLabel, String dstLabel) {
+        g.removeEdge(srcLabel, dstLabel);
+    }
+
+    // --------------------------------------------------------------------------------
+    //*** Feature 4: Output the imported graph into a DOT file or graphics ***
+    // --------------------------------------------------------------------------------
+    // output the imported graph into a DOT file
+    public static void outputDOTGraph(Graph<String, DefaultEdge> g, String filepath) throws IOException {
+        DOTExporter<String, DefaultEdge> dotexporter = new DOTExporter<>(v -> v.toString());
+        FileWriter writer = new FileWriter(filepath);
+        try {
+            dotexporter.exportGraph(g, writer);
+            System.out.println("DOT file has been created.");
+        } catch (Exception e) {
+            System.out.println("DOT file unsuccessful");
+        }
+    }
+
+    // --------------------------------------------------------------------------------
+    // output the imported graph into a graphics, at least for jpg and png
+    public static void outputGraphics(Graph<String, DefaultEdge> g, String path, String format) throws IOException {
+
+        JGraphXAdapter<String, DefaultEdge> graphAdapter = new JGraphXAdapter<>(g);
+        mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
+        layout.execute(graphAdapter.getDefaultParent());
+
+        BufferedImage image = mxCellRenderer.createBufferedImage(graphAdapter, null, 2, Color.WHITE, true, null);
+        File imgFile = new File(path);
+        try {
+            ImageIO.write(image, format, imgFile);
+            System.out.println("Graphics file has been created.");
+        } catch (Exception e) {
+            System.out.println("Graphics file unsuccessful.");
+        }
+
+    }
+
+    // --------------------------------------------------------------------------------
+    public static void printNodes(String[] nodeNames, int numNodes) {
+        System.out.print("labels of nodes: ");
+        for (int a = 0; a < numNodes; a++) {
+            if (a == (numNodes - 1)) {
+                System.out.println(nodeNames[a]);
+            } else {
+                System.out.print(nodeNames[a] + ", ");
+            }
+        }
+    }
+
+    // --------------------------------------------------------------------------------
+    //Output the number of nodes, the label of the nodes, the number of edges, the nodes and the edge direction of edges (e.g., a -> b)
+    public static int getNumNodes(Graph<String, DefaultEdge> g) {
+        return g.vertexSet().size();
+    }
+
+    public static String[] getNodeLabel(Graph<String, DefaultEdge> g, int numNodes) {
+        String nodeNames[] = new String[numNodes];
+
+        int k = 0;
+        String temp = g.vertexSet().toString();
+
+        temp = temp.replace("[", "");
+        temp = temp.replace("]", "");
+
+        while (k < numNodes) {
+            nodeNames = temp.split(", ", numNodes);
+            k++;
+        }
+        return nodeNames;
+    }
+
+    public static int getNumEdges(Graph<String, DefaultEdge> g) {
+        return g.edgeSet().size();
+    }
+
+    public static Set getEdges(Graph<String, DefaultEdge> g) {
+        return g.edgeSet();
+    }
+}
