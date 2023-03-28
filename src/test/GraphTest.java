@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class GraphTest {
 
-    String filepath = "test.gv";
+    String filepath = "shells.gv";
     Graph<String, DefaultEdge> graphTest = graph.parseGraph(filepath); // returns graph
 
     public GraphTest() throws IOException {
@@ -20,25 +20,25 @@ public class GraphTest {
 
         int numNodes = graph.getNumNodes(graphTest);
 
-        Assert.assertEquals("NumNodes test failed", 6, numNodes);
+        Assert.assertEquals("NumNodes test failed", 29, numNodes);
     }
 
     @Test
     public void testRemoveNode() throws IOException {
 
-        graph.removeNode(graphTest, "f");
+        graph.removeNode(graphTest, "rc");
         int numNodes = graph.getNumNodes(graphTest);
 
-        Assert.assertEquals("RemoveNode test failed", 5, numNodes);
+        Assert.assertEquals("RemoveNode test failed", 28, numNodes);
     }
 
     @Test
     public void testAddNode() throws IOException {
 
-        graph.addNode(graphTest, "g");
+        graph.addNode(graphTest, "xx");
         int numNodes = graph.getNumNodes(graphTest);
 
-        Assert.assertEquals("RemoveNode test failed", 7, numNodes);
+        Assert.assertEquals("RemoveNode test failed", 30, numNodes);
     }
 
     @Test
@@ -46,15 +46,15 @@ public class GraphTest {
 
         int numEdges = graph.getNumEdges(graphTest);
 
-        Assert.assertEquals("NumEdges test failed", 5, numEdges);
+        Assert.assertEquals("NumEdges test failed", 38, numEdges);
     }
     @Test
     public void testRemoveEdge() throws IOException {
 
-        graph.removeEdge(graphTest, "b", "e");
+        graph.removeEdge(graphTest, "v9sh", "rc");
         int numEdges = graph.getNumEdges(graphTest);
 
-        Assert.assertEquals("NumEdges test failed", 4, numEdges);
+        Assert.assertEquals("NumEdges test failed", 37, numEdges);
     }
 
 

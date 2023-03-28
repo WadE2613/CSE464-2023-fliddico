@@ -335,7 +335,5 @@ public class graph {
         return g.edgeSet().size();
     }
 
-    public static Set getEdges(Graph<String, DefaultEdge> g) {
-        return g.edgeSet();
-    }
+
 }
