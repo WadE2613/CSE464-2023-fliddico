@@ -3,28 +3,36 @@ import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.util.mxCellRenderer;
 
 import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.shortestpath.BFSShortestPath;
 import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.nio.dot.DOTExporter;
 import org.jgrapht.nio.dot.DOTImporter;
+import org.jgrapht.traverse.BreadthFirstIterator;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.Scanner;
-import java.util.Set;
+import java.net.URI;
+import java.util.*;
+import java.util.List;
+
+import static org.jgrapht.alg.shortestpath.BFSShortestPath.findPathBetween;
 
 
 public class graph {
+    static Graph<String, DefaultEdge> graph;
+    static LinkedList[] adjList;
 
     public static void main(String[] args) throws IOException {
         System.out.println("Enter dot format file name: ");
         Scanner scanner = new Scanner(System.in);
         String filepath = scanner.nextLine();
 
-        Graph<String, DefaultEdge> graph = parseGraph(filepath);
+        graph = parseGraph(filepath);
 
         // Output the number of nodes
         int numNodes = getNumNodes(graph);
@@ -51,7 +59,8 @@ public class graph {
                     "\t3)Add or remove list of nodes\n" +
                     "\t4)Add or remove an edge\n" +
                     "\t5)Output graph to DOT file\n" +
-                    "\t6)Output graph to to graphics");
+                    "\t6)Output graph to to graphics\n\n" +
+                    "\t7)Find path to node");
             optNum = Integer.parseInt(scanner.nextLine());
 
             switch (optNum) {
@@ -122,6 +131,30 @@ public class graph {
                     outGraph = outGraph.replace(" ", "");
                     String[] gName = outGraph.split("\\.");
                     outputGraphics(graph, outGraph, gName[1].toUpperCase());
+                }
+                case 7 -> {
+                    System.out.println("Enter source node:");
+                    String srcNode = scanner.nextLine();
+                    System.out.println("Enter destination node:");
+                    String destNode = scanner.nextLine();
+
+                    //nodesString = graphToString(graph, numEdges);
+                    //System.out.println(graph.edgeSet());
+
+                    if (!graph.vertexSet().contains(srcNode)) {
+                        System.out.println("Source node does not exist!");
+                        break;
+                    }
+                    if (!graph.vertexSet().contains(destNode)) {
+                        System.out.println("Destination node does not exist!");
+                        break;
+                    }
+                    System.out.println("checks good");
+                    //int nodes = getNumNodes(graph);
+                    //int edges = getNumEdges(graph);
+                    GraphSearch(srcNode, destNode);
+
+
                 }
                 default -> {
                 }
@@ -335,5 +368,63 @@ public class graph {
         return g.edgeSet().size();
     }
 
+    // --------------------------------------------------------------------------------
+    // *** Part 2: API: Path GraphSearch(Node src, Node dst)  ***
+    // --------------------------------------------------------------------------------
+
+    public static void GraphSearch(String src, String dest) {
+        int num = getNumNodes(graph);
+        int i = 0;
+
+        String start = "";
+        String end = "";
+        String prev = "";
+
+        adjList = new LinkedList[num];
+        for (int j = 0; j < num; j++) {
+            adjList[j] = new LinkedList<String>();
+
+        }
+        //BFSShortestPath<String, DefaultEdge> path = new BFSShortestPath(graph);
+        GraphPath gPath = BFSShortestPath.findPathBetween(graph, src, dest);
+        System.out.println("path : " + gPath);
+
+
+        Iterator<String> iterator = new BreadthFirstIterator<>(graph, src);
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            System.out.println(next);
+        }
+
+
+
+
+
+    }
+    // --------------------------------------------------------------------------------
+
+    // --------------------------------------------------------------------------------
+    static class Node {
+        int name;
+        Node(int name)  {
+            this.name = name;
+
+        }
+    }
+    // --------------------------------------------------------------------------------
+    static class Edge {
+        String src, dest;
+        Edge(String src, String dest) {
+            this.src = src;
+            this.dest = dest;
+
+        }
+    }
+    // --------------------------------------------------------------------------------
+
+
+
+
+    // --------------------------------------------------------------------------------
 
 }

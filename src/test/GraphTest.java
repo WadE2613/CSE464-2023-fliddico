@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertEquals;
+
 public class GraphTest {
 
     String filepath = "shells.gv";
@@ -56,6 +58,16 @@ public class GraphTest {
 
         Assert.assertEquals("NumEdges test failed", 37, numEdges);
     }
+
+
+//    @Test
+//    public void givenAGraph_whenTraversingBreadthFirst_thenExpectedResult() {
+//        GraphSearch g = graph.createGraph();
+//        assertEquals("[Bob, Alice, Rob, Mark, Maria]",
+//                GraphSearch.breadthFirstTraversal(g, "Bob").toString());
+//    }
+
+
 
 
 }
