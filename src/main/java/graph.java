@@ -150,31 +150,32 @@ public class graph {
                         System.out.println("Destination node does not exist!");
                         break;
                     }
-                    //System.out.println("checks good");
 
-                    System.out.println("Choose algorithm: \n" +
-                            "\t1) BFS\n" +
-                            "\t2) DFS\n");
-                    int algor;
-                    do {
-                        algor = Integer.parseInt(scanner.nextLine());
-                        if (algor == 1) {
+//                    System.out.println("Choose algorithm: \n" +
+//                            "\t1) BFS\n" +
+//                            "\t2) DFS\n");
 
+                    String algor;
+                    Node[] targetNode = new Node[2];
 
-                            // use BFS
-                            Node[] targetNode = new Node[2];
-                            targetNode  =  buildTree(src, dest, numNodes);
+                    targetNode  =  buildTree(src, dest, numNodes);
+                    GraphSearch(targetNode[0], targetNode[1]);
 
+//                    do {
+//                        algor = Integer.parseInt(scanner.nextLine());
+//                        if (algor == 1) {
+//                            // use BFS
+//                            targetNode  =  buildTree(src, dest, numNodes);
+//                            GraphSearch(targetNode[0], targetNode[1]);
+//
+//                        } else if (algor == 2) {
+//                            //use DFS
+//
+//                        } else
+//                            System.out.println("Please enter 1 or 2");
+//                    } while (!(algor == 1) || !(algor == 2));
 
-                            GraphSearch(targetNode[0], targetNode[1]);
-
-                        } else if (algor == 2) {
-                            //use DFS
-                        } else
-                            System.out.println("Please enter 1 or 2");
-                    } while (!(algor == 1) || !(algor == 2));
-
-                   // GraphPath<String, DefaultEdge> bfsPath = findPathBetween(graph, srcNode, destNode);
+                    // GraphPath<String, DefaultEdge> bfsPath = findPathBetween(graph, srcNode, destNode);
                     //GraphSearch(srcNode, destNode, numNodes);
                 }
                 default -> {
@@ -397,13 +398,13 @@ public class graph {
         int i = 0;
         Node[] n = new Node[numNodes];
 
-        System.out.println("src: " + src + " dest: " + dest);
+        //System.out.println("src: " + src + " dest: " + dest);
 
         // add node
         Node [] targetNode = new Node[2];
         for (String V : graph.vertexSet()) {
             n[i] = new Node(V);
-            System.out.println("node[" + i + "]: " + n[i].label);
+            //System.out.println("node[" + i + "]: " + n[i].label);
             if (src.equals(n[i].label)) {
                 targetNode[0] = n[i];
                 System.out.println("src node found: " + targetNode[0].label);
@@ -422,7 +423,7 @@ public class graph {
                 if (graph.getEdgeSource(e) == n[j].label) {
                     for (int k = 0; k < getNumEdges(graph) + 1; k++) {
                         if (graph.getEdgeTarget(e) == n[k].label) {
-                            System.out.println("j=" + j + " edge: " + graph.getEdgeSource(e) + "  k=" + k + " dest: " + graph.getEdgeTarget(e));
+                            //System.out.println("j=" + j + " edge: " + graph.getEdgeSource(e) + "  k=" + k + " dest: " + graph.getEdgeTarget(e));
                             n[j].addEdge(n[k]);
                         }
                     }
@@ -436,9 +437,9 @@ public class graph {
     }
     // --------------------------------------------------------------------------------
     public static void GraphSearch(Node src, Node dest) {
-        System.out.println("BFS Iterative:");
+        System.out.println("BFS:");
         BFS(src, dest);
-        //System.out.println("in graphsearch");
+
     }
     // --------------------------------------------------------------------------------
     static class Node {
@@ -451,10 +452,10 @@ public class graph {
         }
         public void addEdge(Node to) {
             neighbors.add(to);
-            System.out.println("Neighbors: ");
-            for (int i = 0; i < neighbors.size(); i++) {
-                System.out.println(neighbors.get(i).label + " ");
-            }
+            //System.out.println("Neighbors: ");
+            //for (int i = 0; i < neighbors.size(); i++) {
+            //    System.out.println(neighbors.get(i).label + " ");
+            //}
 
         }
 
@@ -462,8 +463,8 @@ public class graph {
     // --------------------------------------------------------------------------------
 
     public static void BFS(Node startNode, Node destNode) {
-        System.out.println("startNode: " + startNode.label);
-        System.out.println("destNode: " + destNode.label);
+        //System.out.println("startNode: " + startNode.label);
+        //System.out.println("destNode: " + destNode.label);
 
         Queue<Node> queue = new LinkedList<>();
         Set<String> visited = new HashSet<>();
@@ -473,10 +474,13 @@ public class graph {
 
         while (!queue.isEmpty()) {
             Node currentNode = queue.remove();
-            System.out.println(currentNode.label);
+            System.out.print(currentNode.label);
             if (currentNode.label == destNode.label) {
-                System.out.println("match dest");
+                //System.out.println("match dest");
                 break;
+            }
+            else {
+                System.out.print("->");
             }
 
             for (Node n : currentNode.neighbors) {
@@ -486,10 +490,8 @@ public class graph {
                 }
             }
         }
+        System.out.println("");
     }
-
-
-    // --------------------------------------------------------------------------------
 
     // --------------------------------------------------------------------------------
 
