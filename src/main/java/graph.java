@@ -25,6 +25,10 @@ import static org.jgrapht.alg.shortestpath.BFSShortestPath.*;
 
 
 public class graph {
+    enum Algorithm {
+        BFS,
+        DFS
+    }
     static Graph<String, DefaultEdge> graph;
 
 
@@ -139,9 +143,6 @@ public class graph {
                     System.out.println("Enter destination node:");
                     String dest = scanner.nextLine();
 
-                    //nodesString = graphToString(graph, numEdges);
-                    //System.out.println(graph.edgeSet());
-
                     if (!graph.vertexSet().contains(src)) {
                         System.out.println("Source node does not exist!");
                         break;
@@ -151,36 +152,33 @@ public class graph {
                         break;
                     }
 
-//                    System.out.println("Choose algorithm: \n" +
-//                            "\t1) BFS\n" +
-//                            "\t2) DFS\n");
+                    System.out.println("Choose algorithm: \n" +
+                            "\t1) BFS\n" +
+                            "\t2) DFS\n");
 
-                    String algor;
+                    int algor;
                     Node[] targetNode = new Node[2];
+                    Algorithm algoBFS = Algorithm.BFS;
+                    Algorithm algoDFS = Algorithm.DFS;
 
-                    targetNode  =  buildTree(src, dest, numNodes);
-                    GraphSearch(targetNode[0], targetNode[1]);
 
-//                    do {
-//                        algor = Integer.parseInt(scanner.nextLine());
-//                        if (algor == 1) {
-//                            // use BFS
-//                            targetNode  =  buildTree(src, dest, numNodes);
-//                            GraphSearch(targetNode[0], targetNode[1]);
-//
-//                        } else if (algor == 2) {
-//                            //use DFS
-//
-//                        } else
-//                            System.out.println("Please enter 1 or 2");
-//                    } while (!(algor == 1) || !(algor == 2));
+                    algor = Integer.parseInt(scanner.nextLine());
+                    if (algor == 1) {
+                        // use BFS
+                        targetNode  =  buildTree(src, dest, numNodes);
+                        GraphSearch(targetNode[0], targetNode[1], algoBFS);
 
-                    // GraphPath<String, DefaultEdge> bfsPath = findPathBetween(graph, srcNode, destNode);
-                    //GraphSearch(srcNode, destNode, numNodes);
+                    } else if (algor == 2) {
+                        //use DFS
+                        targetNode  =  buildTree(src, dest, numNodes);
+                        GraphSearch(targetNode[0], targetNode[1], algoDFS);
+                    } else
+                        System.out.println("Please enter 1 or 2");
+
                 }
                 default -> {
                 }
-                //
+
             }
         } while (optNum >= 1 && optNum <= 7);
 
@@ -436,9 +434,17 @@ public class graph {
         return targetNode;
     }
     // --------------------------------------------------------------------------------
-    public static void GraphSearch(Node src, Node dest) {
-        System.out.println("BFS:");
-        BFS(src, dest);
+    public static void GraphSearch(Node src, Node dest, Algorithm algo) {
+        switch(algo) {
+            case BFS:
+                System.out.println("BFS:");
+                BFS(src, dest);
+                break;
+            case DFS:
+                System.out.println("DFS:");
+                DFS(src, dest);
+                break;
+        }
 
     }
     // --------------------------------------------------------------------------------
@@ -461,7 +467,6 @@ public class graph {
 
     }
     // --------------------------------------------------------------------------------
-
     public static void BFS(Node startNode, Node destNode) {
         //System.out.println("startNode: " + startNode.label);
         //System.out.println("destNode: " + destNode.label);
@@ -493,7 +498,38 @@ public class graph {
         System.out.println("");
     }
 
+
     // --------------------------------------------------------------------------------
+    public static void DFS(Node startNode, Node destNode) {
+        Stack<Node> stack = new Stack<>();
+        Set<String> visited = new HashSet<>();
+
+        stack.push(startNode);
+
+        while (!stack.isEmpty()) {
+            Node currentNode = stack.pop();
+
+            if (!visited.contains(currentNode.label)) {
+                System.out.print(currentNode.label);
+                if (currentNode.label == destNode.label) {
+                    //System.out.println("match dest");
+                    break;
+                }
+                else {
+                    System.out.print("->");
+                }
+
+                visited.add(currentNode.label);
+            }
+
+            for (Node n : currentNode.neighbors) {
+                if (!visited.contains(n.label)) {
+                    stack.push(n);
+                }
+            }
+        }
+        System.out.println("");
+    }
 
 
 }
