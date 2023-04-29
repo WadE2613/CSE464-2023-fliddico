@@ -20,12 +20,13 @@ import java.net.URI;
 import java.util.*;
 import java.util.List;
 
-import static org.jgrapht.alg.shortestpath.BFSShortestPath.findPathBetween;
+import static com.mxgraph.analysis.mxTraversal.bfs;
+import static org.jgrapht.alg.shortestpath.BFSShortestPath.*;
 
 
 public class graph {
     static Graph<String, DefaultEdge> graph;
-    static LinkedList[] adjList;
+
 
     public static void main(String[] args) throws IOException {
         System.out.println("Enter dot format file name: ");
@@ -59,7 +60,7 @@ public class graph {
                     "\t3)Add or remove list of nodes\n" +
                     "\t4)Add or remove an edge\n" +
                     "\t5)Output graph to DOT file\n" +
-                    "\t6)Output graph to to graphics\n\n" +
+                    "\t6)Output graph to to graphics\n" +
                     "\t7)Find path to node");
             optNum = Integer.parseInt(scanner.nextLine());
 
@@ -134,33 +135,53 @@ public class graph {
                 }
                 case 7 -> {
                     System.out.println("Enter source node:");
-                    String srcNode = scanner.nextLine();
+                    String src = scanner.nextLine();
                     System.out.println("Enter destination node:");
-                    String destNode = scanner.nextLine();
+                    String dest = scanner.nextLine();
 
                     //nodesString = graphToString(graph, numEdges);
                     //System.out.println(graph.edgeSet());
 
-                    if (!graph.vertexSet().contains(srcNode)) {
+                    if (!graph.vertexSet().contains(src)) {
                         System.out.println("Source node does not exist!");
                         break;
                     }
-                    if (!graph.vertexSet().contains(destNode)) {
+                    if (!graph.vertexSet().contains(dest)) {
                         System.out.println("Destination node does not exist!");
                         break;
                     }
-                    System.out.println("checks good");
-                    //int nodes = getNumNodes(graph);
-                    //int edges = getNumEdges(graph);
-                    GraphSearch(srcNode, destNode);
+                    //System.out.println("checks good");
+
+                    System.out.println("Choose algorithm: \n" +
+                            "\t1) BFS\n" +
+                            "\t2) DFS\n");
+                    int algor;
+                    do {
+                        algor = Integer.parseInt(scanner.nextLine());
+                        if (algor == 1) {
 
 
+                            // use BFS
+                            Node[] targetNode = new Node[2];
+                            targetNode  =  buildTree(src, dest, numNodes);
+
+
+                            GraphSearch(targetNode[0], targetNode[1]);
+
+                        } else if (algor == 2) {
+                            //use DFS
+                        } else
+                            System.out.println("Please enter 1 or 2");
+                    } while (!(algor == 1) || !(algor == 2));
+
+                   // GraphPath<String, DefaultEdge> bfsPath = findPathBetween(graph, srcNode, destNode);
+                    //GraphSearch(srcNode, destNode, numNodes);
                 }
                 default -> {
                 }
                 //
             }
-        } while (optNum >= 1 && optNum <= 6);
+        } while (optNum >= 1 && optNum <= 7);
 
     }
 
@@ -369,62 +390,108 @@ public class graph {
     }
 
     // --------------------------------------------------------------------------------
-    // *** Part 2: API: Path GraphSearch(Node src, Node dst)  ***
+    // *** Part 2: API: Path GraphSearch(Node src, Node dst, Algorithm algo)  ***
     // --------------------------------------------------------------------------------
 
-    public static void GraphSearch(String src, String dest) {
-        int num = getNumNodes(graph);
+    public static Node[] buildTree(String src, String dest, int numNodes) {
         int i = 0;
+        Node[] n = new Node[numNodes];
 
-        String start = "";
-        String end = "";
-        String prev = "";
+        System.out.println("src: " + src + " dest: " + dest);
 
-        adjList = new LinkedList[num];
-        for (int j = 0; j < num; j++) {
-            adjList[j] = new LinkedList<String>();
+        // add node
+        Node [] targetNode = new Node[2];
+        for (String V : graph.vertexSet()) {
+            n[i] = new Node(V);
+            System.out.println("node[" + i + "]: " + n[i].label);
+            if (src.equals(n[i].label)) {
+                targetNode[0] = n[i];
+                System.out.println("src node found: " + targetNode[0].label);
+            }
+            if (dest.equals(n[i].label)) {
+                targetNode[1] = n[i];
+                System.out.println("dest node found: " + targetNode[1].label);
+            }
 
+            i++;
         }
-        //BFSShortestPath<String, DefaultEdge> path = new BFSShortestPath(graph);
-        GraphPath gPath = BFSShortestPath.findPathBetween(graph, src, dest);
-        System.out.println("path : " + gPath);
 
-
-        Iterator<String> iterator = new BreadthFirstIterator<>(graph, src);
-        while (iterator.hasNext()) {
-            String next = iterator.next();
-            System.out.println(next);
+        // add edge
+        for (DefaultEdge e : graph.edgeSet()) {
+            for (int j = 0; j < getNumEdges(graph); j++) {
+                if (graph.getEdgeSource(e) == n[j].label) {
+                    for (int k = 0; k < getNumEdges(graph) + 1; k++) {
+                        if (graph.getEdgeTarget(e) == n[k].label) {
+                            System.out.println("j=" + j + " edge: " + graph.getEdgeSource(e) + "  k=" + k + " dest: " + graph.getEdgeTarget(e));
+                            n[j].addEdge(n[k]);
+                        }
+                    }
+                }
+            }
         }
 
 
 
-
-
+        return targetNode;
     }
     // --------------------------------------------------------------------------------
-
+    public static void GraphSearch(Node src, Node dest) {
+        System.out.println("BFS Iterative:");
+        BFS(src, dest);
+        //System.out.println("in graphsearch");
+    }
     // --------------------------------------------------------------------------------
     static class Node {
-        int name;
-        Node(int name)  {
-            this.name = name;
+        String label;
+        List<Node> neighbors;
+
+        public Node(String label) {
+            this.label = label;
+            neighbors = new ArrayList<>();
+        }
+        public void addEdge(Node to) {
+            neighbors.add(to);
+            System.out.println("Neighbors: ");
+            for (int i = 0; i < neighbors.size(); i++) {
+                System.out.println(neighbors.get(i).label + " ");
+            }
 
         }
+
     }
     // --------------------------------------------------------------------------------
-    static class Edge {
-        String src, dest;
-        Edge(String src, String dest) {
-            this.src = src;
-            this.dest = dest;
 
+    public static void BFS(Node startNode, Node destNode) {
+        System.out.println("startNode: " + startNode.label);
+        System.out.println("destNode: " + destNode.label);
+
+        Queue<Node> queue = new LinkedList<>();
+        Set<String> visited = new HashSet<>();
+
+        queue.add(startNode);
+        visited.add(startNode.label);
+
+        while (!queue.isEmpty()) {
+            Node currentNode = queue.remove();
+            System.out.println(currentNode.label);
+            if (currentNode.label == destNode.label) {
+                System.out.println("match dest");
+                break;
+            }
+
+            for (Node n : currentNode.neighbors) {
+                if (!visited.contains(n.label)) {
+                    queue.add(n);
+                    visited.add(n.label);
+                }
+            }
         }
     }
-    // --------------------------------------------------------------------------------
-
-
 
 
     // --------------------------------------------------------------------------------
+
+    // --------------------------------------------------------------------------------
+
 
 }
