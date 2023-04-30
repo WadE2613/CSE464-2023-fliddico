@@ -454,17 +454,17 @@ public class graph {
     // --------------------------------------------------------------------------------
     static class Node {
         String label;
-        List<Node> neighbors;
+        List<Node> children;
 
         public Node(String label) {
             this.label = label;
-            neighbors = new ArrayList<>();
+            children = new ArrayList<>();
         }
         public void addEdge(Node to) {
-            neighbors.add(to);
+            children.add(to);
             //System.out.println("Neighbors: ");
-            //for (int i = 0; i < neighbors.size(); i++) {
-            //    System.out.println(neighbors.get(i).label + " ");
+            //for (int i = 0; i < children.size(); i++) {
+            //    System.out.println(children.get(i).label + " ");
             //}
 
         }
@@ -492,7 +492,7 @@ public class graph {
                 System.out.print("->");
             }
 
-            for (Node n : currentNode.neighbors) {
+            for (Node n : currentNode.children) {
                 if (!visited.contains(n.label)) {
                     queue.add(n);
                     visited.add(n.label);
@@ -526,7 +526,7 @@ public class graph {
                 visited.add(currentNode.label);
             }
 
-            for (Node n : currentNode.neighbors) {
+            for (Node n : currentNode.children) {
                 if (!visited.contains(n.label)) {
                     stack.push(n);
                 }
