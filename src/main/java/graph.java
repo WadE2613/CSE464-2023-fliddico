@@ -410,7 +410,8 @@ public class graph {
                 System.out.println("src node found: " + targetNode[0].label);
             }
 
-            if (dest.equals(n[i].label)) {
+            boolean DestEqualsNode = dest.equals(n[i].label);
+            if (DestEqualsNode) {
                 targetNode[1] = n[i];
                 System.out.println("dest node found: " + targetNode[1].label);
             }
