@@ -403,10 +403,13 @@ public class graph {
         for (String V : graph.vertexSet()) {
             n[i] = new Node(V);
             //System.out.println("node[" + i + "]: " + n[i].label);
-            if (src.equals(n[i].label)) {
+
+            boolean SrcEqualsNode = src.equals(n[i].label);
+            if (SrcEqualsNode) {
                 targetNode[0] = n[i];
                 System.out.println("src node found: " + targetNode[0].label);
             }
+
             if (dest.equals(n[i].label)) {
                 targetNode[1] = n[i];
                 System.out.println("dest node found: " + targetNode[1].label);
