@@ -402,6 +402,13 @@ public class graph {
         Node[] targetNode = getNodes(src, dest, n);
 
         // add edge
+        addEdges(n);
+
+        return targetNode;
+    }
+
+    // --------------------------------------------------------------------------------
+    private static void addEdges(Node[] n) {
         int j = 0;
         int k;
 
@@ -422,10 +429,9 @@ public class graph {
             }
             j++;
         }
-
-        return targetNode;
     }
 
+    // --------------------------------------------------------------------------------
     private static Node[] getNodes(String src, String dest, Node[] n) {
         int i = 0;
         Node [] targetNode = new Node[2];
