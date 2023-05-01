@@ -415,25 +415,30 @@ public class graph {
                 targetNode[1] = n[i];
                 System.out.println("dest node found: " + targetNode[1].label);
             }
-
             i++;
         }
 
         // add edge
-        for (DefaultEdge e : graph.edgeSet()) {
-            for (int j = 0; j < getNumEdges(graph); j++) {
-                if (graph.getEdgeSource(e) == n[j].label) {
-                    for (int k = 0; k < getNumEdges(graph) + 1; k++) {
-                        if (graph.getEdgeTarget(e) == n[k].label) {
-                            //System.out.println("j=" + j + " edge: " + graph.getEdgeSource(e) + "  k=" + k + " dest: " + graph.getEdgeTarget(e));
+        int j = 0;
+        int k;
+
+        for (Node N : n) {
+            for (DefaultEdge e : graph.edgeSet()) {
+                if (graph.getEdgeSource(e).equals(n[j].label)) {
+                    //System.out.println("edge: " + e);
+                    //System.out.println("n[" + j + "]: " + n[j].label + "  dest: " + graph.getEdgeTarget(e));
+                    k = 0;
+                    for (Node d : n) {
+                        if (n[k].label.equals(graph.getEdgeTarget(e))){
+                            //System.out.println("dest node found: n[" + k + "]: " + n[k].label);
                             n[j].addEdge(n[k]);
                         }
+                        k++;
                     }
                 }
             }
+            j++;
         }
-
-
 
         return targetNode;
     }
@@ -462,10 +467,10 @@ public class graph {
         }
         public void addEdge(Node to) {
             children.add(to);
-            //System.out.println("Neighbors: ");
-            //for (int i = 0; i < children.size(); i++) {
-            //    System.out.println(children.get(i).label + " ");
-            //}
+//            System.out.println("Neighbors: ");
+//            for (int i = 0; i < children.size(); i++) {
+//                System.out.println(children.get(i).label);
+//            }
 
         }
 
