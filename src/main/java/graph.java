@@ -168,6 +168,7 @@ public class graph {
                         targetNode  =  buildTree(src, dest, numNodes);
                         GraphSearch(targetNode[0], targetNode[1], algoBFS);
 
+
                     } else if (algor == 2) {
                         //use DFS
                         targetNode  =  buildTree(src, dest, numNodes);
@@ -457,14 +458,20 @@ public class graph {
 
     // --------------------------------------------------------------------------------
     public static void GraphSearch(Node src, Node dest, Algorithm algo) {
+
+        Context contextBFS = new Context(new BFS());
+        Context contextDFS = new Context(new DFS());
+
         switch(algo) {
             case BFS:
                 System.out.println("BFS:");
-                BFS(src, dest);
+                //BFS(src, dest);
+                contextBFS.executeStrategy(src, dest);
                 break;
             case DFS:
                 System.out.println("DFS:");
-                DFS(src, dest);
+                //DFS(src, dest);
+                contextDFS.executeStrategy(src, dest);
                 break;
         }
 
@@ -514,7 +521,7 @@ public class graph {
         System.out.println("");
     }
     // --------------------------------------------------------------------------------
-    private static void printPath(Node destNode, Node currentNode) {
+    public static void printPath(Node destNode, Node currentNode) {
         System.out.print(currentNode.label);
         if (currentNode.label == destNode.label) {
             //System.out.println("match dest");
@@ -526,7 +533,7 @@ public class graph {
 
 
     // --------------------------------------------------------------------------------
-    public static void DFS(Node startNode, Node destNode) {
+    public static void DFS(Node startNode, Node destNode){
         Stack<Node> stack = new Stack<>();
         Set<String> visited = new HashSet<>();
 
@@ -550,6 +557,8 @@ public class graph {
         }
         System.out.println("");
     }
+    // --------------------------------------------------------------------------------
+
 
 
 }
