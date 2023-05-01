@@ -501,14 +501,8 @@ public class graph {
 
         while (!queue.isEmpty()) {
             Node currentNode = queue.remove();
-            System.out.print(currentNode.label);
-            if (currentNode.label == destNode.label) {
-                //System.out.println("match dest");
-                break;
-            }
-            else {
-                System.out.print("->");
-            }
+
+            printPath(destNode, currentNode);
 
             for (Node n : currentNode.children) {
                 if (!visited.contains(n.label)) {
@@ -518,6 +512,16 @@ public class graph {
             }
         }
         System.out.println("");
+    }
+    // --------------------------------------------------------------------------------
+    private static void printPath(Node destNode, Node currentNode) {
+        System.out.print(currentNode.label);
+        if (currentNode.label == destNode.label) {
+            //System.out.println("match dest");
+        }
+        else {
+            System.out.print("->");
+        }
     }
 
 
@@ -532,14 +536,8 @@ public class graph {
             Node currentNode = stack.pop();
 
             if (!visited.contains(currentNode.label)) {
-                System.out.print(currentNode.label);
-                if (currentNode.label == destNode.label) {
-                    //System.out.println("match dest");
-                    break;
-                }
-                else {
-                    System.out.print("->");
-                }
+
+                printPath(destNode, currentNode);
 
                 visited.add(currentNode.label);
             }
