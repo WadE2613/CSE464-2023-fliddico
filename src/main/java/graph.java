@@ -393,30 +393,13 @@ public class graph {
     // --------------------------------------------------------------------------------
 
     public static Node[] buildTree(String src, String dest, int numNodes) {
-        int i = 0;
+        
         Node[] n = new Node[numNodes];
 
         //System.out.println("src: " + src + " dest: " + dest);
 
         // add node
-        Node [] targetNode = new Node[2];
-        for (String V : graph.vertexSet()) {
-            n[i] = new Node(V);
-            //System.out.println("node[" + i + "]: " + n[i].label);
-
-            boolean SrcEqualsNode = src.equals(n[i].label);
-            if (SrcEqualsNode) {
-                targetNode[0] = n[i];
-                System.out.println("src node found: " + targetNode[0].label);
-            }
-
-            boolean DestEqualsNode = dest.equals(n[i].label);
-            if (DestEqualsNode) {
-                targetNode[1] = n[i];
-                System.out.println("dest node found: " + targetNode[1].label);
-            }
-            i++;
-        }
+        Node[] targetNode = getNodes(src, dest, n);
 
         // add edge
         int j = 0;
@@ -442,6 +425,30 @@ public class graph {
 
         return targetNode;
     }
+
+    private static Node[] getNodes(String src, String dest, Node[] n) {
+        int i = 0;
+        Node [] targetNode = new Node[2];
+        for (String V : graph.vertexSet()) {
+            n[i] = new Node(V);
+            //System.out.println("node[" + i + "]: " + n[i].label);
+
+            boolean SrcEqualsNode = src.equals(n[i].label);
+            if (SrcEqualsNode) {
+                targetNode[0] = n[i];
+                System.out.println("src node found: " + targetNode[0].label);
+            }
+
+            boolean DestEqualsNode = dest.equals(n[i].label);
+            if (DestEqualsNode) {
+                targetNode[1] = n[i];
+                System.out.println("dest node found: " + targetNode[1].label);
+            }
+            i++;
+        }
+        return targetNode;
+    }
+
     // --------------------------------------------------------------------------------
     public static void GraphSearch(Node src, Node dest, Algorithm algo) {
         switch(algo) {
