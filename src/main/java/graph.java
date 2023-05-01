@@ -27,7 +27,8 @@ import static org.jgrapht.alg.shortestpath.BFSShortestPath.*;
 public class graph {
     enum Algorithm {
         BFS,
-        DFS
+        DFS,
+        RANDOM
     }
     static Graph<String, DefaultEdge> graph;
 
@@ -154,12 +155,14 @@ public class graph {
 
                     System.out.println("Choose algorithm: \n" +
                             "\t1) BFS\n" +
-                            "\t2) DFS\n");
+                            "\t2) DFS\n" +
+                            "\t3) Random Walk\n");
 
                     int algor;
                     Node[] targetNode = new Node[2];
                     Algorithm algoBFS = Algorithm.BFS;
                     Algorithm algoDFS = Algorithm.DFS;
+                    Algorithm algoRand = Algorithm.RANDOM;
 
 
                     algor = Integer.parseInt(scanner.nextLine());
@@ -168,13 +171,17 @@ public class graph {
                         targetNode  =  buildTree(src, dest, numNodes);
                         GraphSearch(targetNode[0], targetNode[1], algoBFS);
 
-
                     } else if (algor == 2) {
                         //use DFS
                         targetNode  =  buildTree(src, dest, numNodes);
                         GraphSearch(targetNode[0], targetNode[1], algoDFS);
+                    } else if (algor == 3) {
+                        // use random walk
+                        targetNode  =  buildTree(src, dest, numNodes);
+                        GraphSearch(targetNode[0], targetNode[1], algoRand);
+
                     } else
-                        System.out.println("Please enter 1 or 2");
+                        System.out.println("Please enter 1-3");
 
                 }
                 default -> {
@@ -461,6 +468,7 @@ public class graph {
 
         Context contextBFS = new Context(new BFS());
         Context contextDFS = new Context(new DFS());
+        Context contextRAND = new Context(new RandomWalk());
 
         switch(algo) {
             case BFS:
@@ -472,6 +480,11 @@ public class graph {
                 System.out.println("DFS:");
                 //DFS(src, dest);
                 contextDFS.executeStrategy(src, dest);
+                break;
+            case RANDOM:
+                System.out.println("Random Walk:");
+                //DFS(src, dest);
+                contextRAND.executeStrategy(src, dest);
                 break;
         }
 
